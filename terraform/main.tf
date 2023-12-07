@@ -2,23 +2,49 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "aws_iam_role" "existing_lambda_execution_role" {
+resource "aws_iam_role" "lambda_execution_role" {
   name = "lambda_execution_role"
 
-  # If the role is in a different account or region, specify the values below
-  # source_account = "123456789012"
-  # source_region  = "us-west-2"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_lambda_function" "hello_world_lambda" {
   function_name    = "hello-world-lambda"
   runtime          = "nodejs14.x"
   handler          = "handler.hello"
-  filename         = "/home/runner/work/Jasper/Jasper/my-lambda-function/.serverless/my-lambda-function.zip"
-  role             = data.aws_iam_role.existing_lambda_execution_role.arn
-  source_code_hash = filebase64("/home/runner/work/Jasper/Jasper/my-lambda-function/.serverless/my-lambda-function.zip")
+  filename         = "/home/runner/work/Assessment/Assessment/my-lambda-function/.serverless/my-lambda-function.zip"
+  role             = aws_iam_role.lambda_execution_role.arn
+  source_code_hash = filebase64("/home/runner/work/Assessment/Assessment/my-lambda-function/.serverless/my-lambda-function.zip")
+
+  # IAM Policy for Lambda function
+  iam_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
 }
 
+# Rest of your existing configuration remains unchanged
 resource "aws_api_gateway_rest_api" "api" {
   name        = "my-api"
   description = "My API"
@@ -62,10 +88,3 @@ resource "aws_api_gateway_deployment" "deployment" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   stage_name  = "prod"
 }
-
-
-
-
-
-
-
