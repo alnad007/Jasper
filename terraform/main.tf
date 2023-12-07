@@ -19,16 +19,10 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 }
 
-resource "aws_lambda_function" "hello_world_lambda" {
-  function_name    = "hello-world-lambda"
-  runtime          = "nodejs14.x"
-  handler          = "handler.hello"
-  filename         = "/home/runner/work/Jasper/Jasper/my-lambda-function/.serverless/my-lambda-function.zip"
-  role             = aws_iam_role.lambda_execution_role.arn
-  source_code_hash = filebase64("/home/runner/work/Jasper/Jasper/my-lambda-function/.serverless/my-lambda-function.zip")
-
-  # IAM Policy for Lambda function
-  iam_policy = jsonencode({
+resource "aws_iam_role_policy" "lambda_execution_policy" {
+  name   = "lambda_execution_policy"
+  role   = aws_iam_role.lambda_execution_role.name
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
@@ -42,6 +36,15 @@ resource "aws_lambda_function" "hello_world_lambda" {
       }
     ]
   })
+}
+
+resource "aws_lambda_function" "hello_world_lambda" {
+  function_name    = "hello-world-lambda"
+  runtime          = "nodejs14.x"
+  handler          = "handler.hello"
+  filename         = "/home/runner/work/Jasper/Jasper/my-lambda-function/.serverless/my-lambda-function.zip"
+  role             = aws_iam_role.lambda_execution_role.arn
+  source_code_hash = filebase64("/home/runner/work/Jasper/Jasper/my-lambda-function/.serverless/my-lambda-function.zip")
 }
 
 # Rest of your existing configuration remains unchanged
