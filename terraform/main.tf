@@ -23,9 +23,9 @@ resource "aws_lambda_function" "hello_world_lambda" {
   function_name    = "hello-world-lambda"
   runtime          = "nodejs14.x"
   handler          = "handler.hello"
-  filename         = "/home/runner/work/Assessment/Assessment/my-lambda-function/.serverless/my-lambda-function.zip"
+  filename         = "/home/runner/work/Jasper/Jasper/my-lambda-function/.serverless/my-lambda-function.zip"
   role             = aws_iam_role.lambda_execution_role.arn
-  source_code_hash = filebase64("/home/runner/work/Assessment/Assessment/my-lambda-function/.serverless/my-lambda-function.zip")
+  source_code_hash = filebase64("/home/runner/work/Jasper/Jasper/my-lambda-function/.serverless/my-lambda-function.zip")
 
   # IAM Policy for Lambda function
   iam_policy = jsonencode({
